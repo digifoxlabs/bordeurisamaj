@@ -12,4 +12,6 @@ class Member extends Model
     {
         return ['date_of_birth' => 'date'];
     }
+
+    public function documents() { return $this->hasMany(MemberDocument::class); }
 }

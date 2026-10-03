@@ -33,6 +33,8 @@ body{background:#f7f8fa;color:#202b38}.dark body{background:#0e1218;color:#edf1f
 :root:not(.dark) .hint{color:#687686}
 .hidden{display:none!important}
 .document-file{width:100%;max-width:100%;border:1px solid #c6ced8;border-radius:7px;background:var(--field);color:var(--ink)}
+.document-choices{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}.document-toggle{justify-self:start}.member-documents{grid-column:1/-1;margin-top:24px;border-top:1px solid var(--line);padding-top:16px}.member-documents h3{font-size:13px}.member-documents .document-name{margin:10px 0}.document-name a{margin-left:auto;font-size:11px;color:var(--orange)}
+@media(max-width:600px){.document-choices{grid-template-columns:1fr}.document-choices{grid-column:auto}}
 :root:not(.dark) .admin-heading p,:root:not(.dark) .table-heading p,:root:not(.dark) .admin-user small{color:#5d6978}
 :root:not(.dark) .stat-card>small,:root:not(.dark) .stat-foot{color:#596777}
 :root:not(.dark) th{color:#566272;background:#f0f2f5}

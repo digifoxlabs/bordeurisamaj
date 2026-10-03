@@ -17,20 +17,20 @@
             type="email" name="email" value="{{ $v('email') }}" placeholder="you@example.com"><small
             class="error-text">{{ $errors->first('email') }}</small></label>
     <fieldset class="field field-wide">
-        <legend>Community role <small class="label-as">/ {{ __('membership.role') }}</small></legend>
+        <legend>Community role <small class="label-as">/ {{ __('membership.role') }}</small> <i>*</i></legend>
         <div class="role-options">@foreach(['Burha'=>'burha','Deka'=>'deka','Hota'=>'hota','Bidhipathak'=>'bidhipathak']
             as $role=>$key)<label class="role-choice"><input type="radio" name="role" value="{{ $role }}"
-                    @checked($v('role')===$role)><span>{{ $role }}
+                    @checked($v('role')===$role) @required($loop->first)><span>{{ $role }}
                     <small>{{ __("membership.$key") }}</small></span></label>@endforeach</div><small
             class="error-text">{{ $errors->first('role') }}</small>
     </fieldset>
     <label class="field"><span>Father's name <small class="label-as">/
-                {{ __('membership.father_name') }}</small></span><input name="father_name"
-            value="{{ $v('father_name') }}" placeholder="Father's full name"><small
+            {{ __('membership.father_name') }}</small> <i>*</i></span><input name="father_name"
+            value="{{ $v('father_name') }}" placeholder="Father's full name" required maxlength="160"><small
             class="error-text">{{ $errors->first('father_name') }}</small></label>
     <label class="field"><span>Grandfather's name <small class="label-as">/
-                {{ __('membership.grandfather_name') }}</small></span><input name="grandfather_name"
-            value="{{ $v('grandfather_name') }}" placeholder="Grandfather's full name"><small
+                {{ __('membership.grandfather_name') }}</small> <i>*</i></span><input name="grandfather_name"
+            value="{{ $v('grandfather_name') }}" placeholder="Grandfather's full name" required maxlength="160"><small
             class="error-text">{{ $errors->first('grandfather_name') }}</small></label>
     <label class="field"><span>Date of birth <small class="label-as">/
                 {{ __('membership.date_of_birth') }}</small></span><input type="date" name="date_of_birth"
@@ -64,5 +64,14 @@
                     class="hint">Square portrait · JPG, PNG or WebP · Max 5 MB</small>
             </div><input type="hidden" name="photo_preview" id="photo-preview-data" value="{{ old('photo_preview') }}">
         </div><small class="error-text">{{ $errors->first('photo') }}</small>
+    </div>
+    <div class="field field-wide document-fields">
+        <button class="button button-soft document-toggle" type="button" aria-expanded="{{ old('show_documents') ? 'true' : 'false' }}">Upload documents <span>＋</span></button>
+        <input type="hidden" name="show_documents" value="{{ old('show_documents') ? '1' : '' }}">
+        <div class="document-choices {{ old('show_documents') ? '' : 'hidden' }}">
+            @for($i = 0; $i < 2; $i++)
+            <label class="field"><span>Document {{ $i + 1 }} name</span><input name="documents[{{ $i }}][title]" value="{{ old("documents.$i.title") }}" maxlength="160" placeholder="e.g. Identity proof"><input class="document-file" type="file" name="documents[{{ $i }}][file]" accept="*/*"><small class="error-text">{{ $errors->first("documents.$i.file") }}</small></label>
+            @endfor
+        </div>
     </div>
 </div>

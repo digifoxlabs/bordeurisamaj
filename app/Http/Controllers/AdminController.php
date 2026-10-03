@@ -51,17 +51,38 @@ class AdminController extends Controller
     public function update(Request $request, Member $member)
     {
         $data = $request->validate((new MemberController)->rules($member));
+        unset($data['documents']);
         if ($request->hasFile('photo')) {
             if ($member->photo) Storage::disk('public')->delete($member->photo);
             $data['photo'] = $request->file('photo')->store('members', 'public');
         }
         $member->update($data);
+        foreach ($request->file('documents', []) as $item) {
+            if (empty($item['file'])) continue;
+            $path = $item['file']->store('member-documents/'.$member->id, 'local');
+            $member->documents()->create(['title' => $item['title'] ?: $item['file']->getClientOriginalName(), 'original_name' => $item['file']->getClientOriginalName(), 'path' => $path]);
+        }
         return redirect()->route('admin.members.show', $member)->with('status', 'Member record updated.');
+    }
+
+    public function downloadMemberDocument(Member $member, \App\Models\MemberDocument $document)
+    {
+        abort_unless($document->member_id === $member->id && Storage::disk('local')->exists($document->path), 404);
+        return Storage::disk('local')->download($document->path, $document->original_name);
+    }
+
+    public function deleteMemberDocument(Member $member, \App\Models\MemberDocument $document)
+    {
+        abort_unless($document->member_id === $member->id, 404);
+        Storage::disk('local')->delete($document->path);
+        $document->delete();
+        return back()->with('status', 'Member document deleted.');
     }
 
     public function destroy(Member $member)
     {
         if ($member->photo) Storage::disk('public')->delete($member->photo);
+        foreach ($member->documents as $document) Storage::disk('local')->delete($document->path);
         $member->delete();
         return redirect()->route('admin.dashboard')->with('status', 'Member record deleted.');
     }

@@ -22,6 +22,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/members/{member}', [AdminController::class, 'show'])->name('members.show');
         Route::get('/members/{member}/edit', [AdminController::class, 'edit'])->name('members.edit');
         Route::put('/members/{member}', [AdminController::class, 'update'])->name('members.update');
+        Route::get('/members/{member}/documents/{document}/download', [AdminController::class, 'downloadMemberDocument'])->name('members.documents.download');
+        Route::delete('/members/{member}/documents/{document}', [AdminController::class, 'deleteMemberDocument'])->name('members.documents.destroy');
         Route::delete('/members/{member}', [AdminController::class, 'destroy'])->name('members.destroy');
         Route::get('/profile', [AdminController::class, 'profile'])->name('profile');
         Route::put('/profile', [AdminController::class, 'updateProfile'])->name('profile.update');

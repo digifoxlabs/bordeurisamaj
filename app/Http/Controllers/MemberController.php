@@ -16,13 +16,16 @@ class MemberController extends Controller
             'mobile' => ['required', 'digits:10', 'unique:members,mobile'.($member ? ','.$member->id : '')],
             'whatsapp' => ['nullable', 'digits:10'],
             'email' => ['nullable', 'email', 'max:190'],
-            'role' => ['nullable', 'in:Burha,Deka,Hota,Bidhipathak'],
-            'father_name' => ['nullable', 'string', 'max:160'],
-            'grandfather_name' => ['nullable', 'string', 'max:160'],
+            'role' => ['required', 'in:Burha,Deka,Hota,Bidhipathak'],
+            'father_name' => ['required', 'string', 'max:160'],
+            'grandfather_name' => ['required', 'string', 'max:160'],
             'date_of_birth' => ['nullable', 'date', 'before_or_equal:today'],
             'address' => ['nullable', 'string', 'max:2000'],
             'occupation' => ['nullable', 'string', 'max:190'],
             'photo' => ['nullable', 'image', 'max:5120'],
+            'documents' => ['nullable', 'array', 'max:2'],
+            'documents.*.title' => ['required_with:documents.*.file', 'nullable', 'string', 'max:160'],
+            'documents.*.file' => ['nullable', 'file', 'max:10240'],
         ];
     }
 
@@ -43,6 +46,14 @@ class MemberController extends Controller
     public function preview(Request $request)
     {
         $data = $request->validate($this->rules());
+        $docs = [];
+        foreach ($request->file('documents', []) as $index => $item) {
+            if (empty($item['file'])) continue;
+            $path = $item['file']->store('pending-member-documents', 'local');
+            $docs[] = ['path' => $path, 'title' => $item['title'] ?? '', 'original_name' => $item['file']->getClientOriginalName()];
+        }
+        session(['pending_member_documents' => $docs]);
+        $data['document_names'] = array_map(fn ($doc) => $doc['title'] ?: $doc['original_name'], $docs);
         if ($request->filled('photo_preview')) {
             $request->validate(['photo_preview' => ['string', 'max:7000000']]);
             $data['photo_preview'] = $request->input('photo_preview');
@@ -59,6 +70,7 @@ class MemberController extends Controller
             return redirect()->route('membership.create')->withErrors($validator)->withInput($request->except('photo_preview', 'photo'));
         }
         $data = $validator->validated();
+        $pendingDocs = session()->pull('pending_member_documents', []);
         if ($request->filled('photo_preview')) {
             $request->validate(['photo_preview' => ['string', 'max:7000000']]);
             $parts = explode(',', $request->input('photo_preview'), 2);
@@ -71,6 +83,11 @@ class MemberController extends Controller
             }
         } elseif ($request->hasFile('photo')) $data['photo'] = $request->file('photo')->store('members', 'public');
         $member = Member::create($data);
+        foreach ($pendingDocs as $doc) {
+            $target = 'member-documents/'.$member->id.'/'.basename($doc['path']);
+            Storage::disk('local')->move($doc['path'], $target);
+            $member->documents()->create(['title' => $doc['title'] ?: $doc['original_name'], 'original_name' => $doc['original_name'], 'path' => $target]);
+        }
         return redirect()->route('success', $member);
     }
 
