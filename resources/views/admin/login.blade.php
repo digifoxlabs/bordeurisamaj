@@ -1,0 +1,5 @@
+@extends('layouts.app')
+@section('title','Administrator sign in')
+@section('content')
+<div class="login-wrap"><div class="login-card surface"><div class="hero-seal mini-seal">ॐ</div><span class="section-kicker">ADMINISTRATOR PORTAL</span><h1>Welcome back.</h1><p>Sign in to manage community membership records.</p>@if($errors->any())<div class="alert alert-error">{{ $errors->first() }}</div>@endif<form method="POST" action="{{ route('admin.authenticate') }}" class="login-form">@csrf<label class="field"><span>Email address</span><input type="email" name="email" value="{{ old('email') }}" placeholder="admin@kamakhya.com" required autofocus></label><label class="field"><span>Password</span><input type="password" name="password" placeholder="Enter your password" required></label><label class="remember"><input type="checkbox" name="remember"> Keep me signed in</label><button class="button button-primary button-full" type="submit">Sign in <span>→</span></button></form><a href="{{ route('home') }}" class="back-link login-back">← Return to website</a></div></div>
+@endsection
