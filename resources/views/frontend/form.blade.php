@@ -6,7 +6,9 @@
 <form id="member-form" class="surface form-surface" method="POST" action="{{ route('membership.preview') }}" enctype="multipart/form-data">@csrf
 <div class="form-section-title"><span class="step-number">01</span><div><b>Personal information</b><small>Your details help us keep in touch.</small></div></div>
 @include('frontend.fields')
-<div class="form-footer"><span>🔒 Your information is kept private and secure.</span><button class="button button-primary" type="submit">Preview details <span>→</span></button></div></form></div>
+<div class="form-footer"><span>🔒 Your information is kept private and secure.</span>
+    <button class="button button-primary" type="submit">Preview details <span>→</span></button>
+</div></form></div>
 @endsection
 @push('scripts')
 <script>

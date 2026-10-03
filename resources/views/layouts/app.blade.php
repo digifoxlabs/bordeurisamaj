@@ -14,6 +14,6 @@
 <body @class(['min-h-screen', 'bg-[#f7f8fa]', 'text-slate-800', 'antialiased', 'dark:bg-[#0e1218]', 'dark:text-slate-100'])>
 <header @class(['site-header'])><a href="{{ route('home') }}" @class(['brand'])><span @class(['brand-mark'])>ॐ</span><span><b>বড়দেউৰী সমাজ, কামাখ্যা দেৱালয়</b><small>প্ৰাপ্তবয়স্ক পুৰুষ সদস্য পঞ্জীয়ন প্ৰপত্ৰ</small></span></a><div @class(['header-actions'])><button @class(['theme-toggle']) type="button" aria-label="Toggle dark mode" onclick="document.documentElement.classList.toggle('dark');localStorage.setItem('kd-theme',document.documentElement.classList.contains('dark')?'dark':'light')"><span @class(['sun'])>☼</span><span @class(['moon'])>☾</span></button>@if(request()->is('admin*') && auth()->check())<a @class(['nav-link']) href="{{ route('admin.dashboard') }}">Dashboard</a><a @class(['nav-link']) href="{{ route('admin.documents.index') }}">Documents</a><a @class(['nav-link']) href="{{ route('admin.profile') }}">Profile</a><form method="POST" action="{{ route('admin.logout') }}">@csrf<button @class(['nav-link']) type="submit">Sign out</button></form>@else<a href="{{ route('home') }}" @class(['nav-link'])>Home</a>@endif</div></header>
 <main>@yield('content')</main>
-<footer @class(['site-footer'])><span>Kamakhya Devalaya · Community Membership</span><span>Made with care for our community</span></footer>
+<footer @class(['site-footer'])><span>বড়দেউৰী সমাজ, কামাখ্যা দেৱালয়</span><span>Made by <a href="https://digifoxlabs.com">Digifoxlabs</a></span></footer>
 @stack('scripts')
 </body></html>
