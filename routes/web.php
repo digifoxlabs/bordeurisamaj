@@ -19,6 +19,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('/logout', [AdminController::class, 'logout'])->name('logout');
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+        Route::get('/members/export/pdf', [AdminController::class, 'exportMembersPdf'])->name('members.export.pdf');
         Route::get('/members/{member}', [AdminController::class, 'show'])->name('members.show');
         Route::get('/members/{member}/edit', [AdminController::class, 'edit'])->name('members.edit');
         Route::put('/members/{member}', [AdminController::class, 'update'])->name('members.update');

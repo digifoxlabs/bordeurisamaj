@@ -24,6 +24,7 @@
                 <h2>Member records</h2>
                 <p>View, print, edit or remove a member entry.</p>
             </div>
+            <a class="button button-primary" href="{{ route('admin.members.export.pdf', request()->only('q')) }}" target="_blank" rel="noopener">Export PDF <span>↗</span></a>
         </div>
         <div class="table-tools">
             <form class="per-page-form" method="GET" action="{{ route('admin.dashboard') }}"><label
@@ -68,15 +69,8 @@
                         <td><span class="role-pill">{{ $member->role ?: '—' }}</span></td>
                         <td>{{ $member->created_at->format('d M Y') }}</td>
                         <td>
-                            <div class="row-actions"><a href="{{ route('admin.members.show',$member) }}">View</a><a
-                                    href="{{ route('admin.members.edit',$member) }}">Edit</a>
-
-                                    {{-- Temp Disabled --}}
-                                {{-- <form method="POST" action="{{ route('admin.members.destroy',$member) }}"
-                                    onsubmit="return confirm('Delete this member record?')">@csrf
-                                    @method('DELETE')<button>Delete</button></form> --}}
-
-                            </div>
+                            <details class="actions-menu"><summary><span>Actions</span><svg aria-hidden="true" viewBox="0 0 16 16"><path d="m4 6 4 4 4-4"/></svg></summary><div class="actions-menu-panel"><a href="{{ route('admin.members.show',$member) }}"><span class="action-menu-icon">↗</span>View</a><a href="{{ route('admin.members.edit',$member) }}"><span class="action-menu-icon">✎</span>Edit</a><button type="button" class="delete-action" data-delete-form="delete-member-{{ $member->id }}"><span class="action-menu-icon">⌫</span>Delete</button></div></details>
+                            <form id="delete-member-{{ $member->id }}" method="POST" action="{{ route('admin.members.destroy',$member) }}" hidden>@csrf @method('DELETE')</form>
                         </td>
                     </tr>@empty<tr>
                         <td colspan="5" class="empty-row">No member records found. @if(request('q'))Try a different
@@ -98,4 +92,38 @@
         </nav>@endif
     </section>
 </div>
+<dialog class="delete-modal" id="delete-member-modal" aria-labelledby="delete-modal-title"><div class="delete-modal-content"><h2 id="delete-modal-title">Delete member record?</h2><p>This will permanently remove the member and their stored documents.</p><div class="delete-modal-actions"><button type="button" class="button button-soft" data-close-delete>Cancel</button><button type="button" class="button button-danger" id="confirm-delete-member">Delete record</button></div></div></dialog>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('delete-member-modal');
+    let formId = null;
+    const menus = [...document.querySelectorAll('.actions-menu')];
+    menus.forEach(menu => menu.addEventListener('toggle', () => {
+        if (menu.open) {
+            menus.forEach(other => { if (other !== menu) other.open = false; });
+            requestAnimationFrame(() => {
+                if (!menu.open) return;
+                const summary = menu.querySelector('summary');
+                const panel = menu.querySelector('.actions-menu-panel');
+                const rect = summary.getBoundingClientRect();
+                const panelRect = panel.getBoundingClientRect();
+                const top = rect.bottom + panelRect.height + 6 > window.innerHeight ? rect.top - panelRect.height - 6 : rect.bottom + 6;
+                panel.style.left = `${Math.max(8, Math.min(rect.right - panelRect.width, window.innerWidth - panelRect.width - 8))}px`;
+                panel.style.top = `${Math.max(8, top)}px`;
+            });
+        }
+    }));
+    document.addEventListener('click', event => {
+        menus.forEach(menu => { if (menu.open && !menu.contains(event.target)) menu.open = false; });
+    });
+    window.addEventListener('scroll', () => menus.forEach(menu => { menu.open = false; }), true);
+    document.querySelectorAll('[data-delete-form]').forEach(button => button.addEventListener('click', () => {
+        formId = button.dataset.deleteForm;
+        modal.showModal();
+    }));
+    document.querySelector('[data-close-delete]').addEventListener('click', () => modal.close());
+    document.getElementById('confirm-delete-member').addEventListener('click', () => document.getElementById(formId)?.requestSubmit());
+    modal.addEventListener('click', event => { if (event.target === modal) modal.close(); });
+});
+</script>
 @endsection

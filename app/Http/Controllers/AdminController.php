@@ -45,6 +45,16 @@ class AdminController extends Controller
         ]);
     }
 
+    public function exportMembersPdf(Request $request)
+    {
+        $query = Member::query()->latest();
+        if ($search = $request->string('q')->trim()->toString()) {
+            $query->where(fn ($q) => $q->where('name', 'like', "%$search%")->orWhere('mobile', 'like', "%$search%"));
+        }
+
+        return view('admin.members-export', ['members' => $query->get()]);
+    }
+
     public function show(Member $member) { return view('admin.member', compact('member')); }
     public function edit(Member $member) { return view('admin.edit', compact('member')); }
 
