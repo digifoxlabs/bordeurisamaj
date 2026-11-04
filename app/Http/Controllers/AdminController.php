@@ -55,6 +55,32 @@ class AdminController extends Controller
         return view('admin.members-export', ['members' => $query->get()]);
     }
 
+    public function exportMembersExcel()
+    {
+        $columns = [
+            'id', 'name_assamese', 'name', 'mobile', 'whatsapp', 'email', 'role',
+            'father_name_assamese', 'father_name', 'grandfather_name', 'date_of_birth',
+            'address', 'occupation', 'photo', 'created_at', 'updated_at',
+        ];
+
+        return response()->streamDownload(function () use ($columns) {
+            $output = fopen('php://output', 'w');
+            // Excel uses this marker to open the CSV with UTF-8 Assamese text.
+            fwrite($output, "\xEF\xBB\xBF");
+            fputcsv($output, $columns);
+
+            Member::query()->orderBy('id')->chunk(500, function ($members) use ($output, $columns) {
+                foreach ($members as $member) {
+                    fputcsv($output, array_map(fn ($column) => $member->getAttribute($column), $columns));
+                }
+            });
+
+            fclose($output);
+        }, 'members-'.now()->format('Y-m-d').'.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
     public function show(Member $member) { return view('admin.member', compact('member')); }
     public function edit(Member $member) { return view('admin.edit', compact('member')); }
 

@@ -13,11 +13,13 @@ class MemberController extends Controller
     {
         return [
             'name' => ['required', 'string', 'max:160'],
+            'name_assamese' => ['nullable', 'string', 'max:160'],
             'mobile' => ['required', 'digits:10', 'unique:members,mobile'.($member ? ','.$member->id : '')],
             'whatsapp' => ['nullable', 'digits:10'],
             'email' => ['nullable', 'email', 'max:190'],
             'role' => ['required', 'in:Burha,Deka,Hota,Bidhipathak'],
             'father_name' => ['required', 'string', 'max:160'],
+            'father_name_assamese' => ['nullable', 'string', 'max:160'],
             'grandfather_name' => ['required', 'string', 'max:160'],
             'date_of_birth' => ['nullable', 'date', 'before_or_equal:today'],
             'address' => ['nullable', 'string', 'max:2000'],

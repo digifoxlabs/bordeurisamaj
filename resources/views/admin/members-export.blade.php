@@ -17,7 +17,7 @@
         <thead><tr><th>PHOTO</th><th>MEMBER</th><th>FATHER'S NAME</th><th>MOBILE</th><th>COMMUNITY ROLE</th><th>JOINED</th></tr></thead>
         <tbody>
             @forelse($members as $member)
-                <tr><td class="photo-cell">@if($member->photo)<img class="member-photo" src="{{ Storage::url($member->photo) }}" alt="">@else<div class="member-photo" aria-label="No photo"></div>@endif</td><td><span class="member-name">{{ $member->name }}</span><span class="member-email">{{ $member->email ?: 'No email provided' }}</span></td><td>{{ $member->father_name ?: '—' }}</td><td>{{ $member->mobile }}</td><td>{{ $member->role ?: '—' }}</td><td>{{ $member->created_at->format('d M Y') }}</td></tr>
+                <tr><td class="photo-cell">@if($member->photo)<img class="member-photo" src="{{ Storage::url($member->photo) }}" alt="">@else<div class="member-photo" aria-label="No photo"></div>@endif</td><td><span class="member-name">{{ $member->name_assamese ?: $member->name }}{{ $member->name_assamese ? ' / '.$member->name : '' }}</span><span class="member-email">{{ $member->email ?: 'No email provided' }}</span></td><td>{{ $member->father_name_assamese ? $member->father_name_assamese.' / ' : '' }}{{ $member->father_name ?: '—' }}</td><td>{{ $member->mobile }}</td><td>{{ $member->role ?: '—' }}</td><td>{{ $member->created_at->format('d M Y') }}</td></tr>
             @empty
                 <tr><td class="empty" colspan="6">No member records found.</td></tr>
             @endforelse

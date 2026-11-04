@@ -24,7 +24,7 @@
                 <h2>Member records</h2>
                 <p>View, print, edit or remove a member entry.</p>
             </div>
-            <a class="button button-primary" href="{{ route('admin.members.export.pdf', request()->only('q')) }}" target="_blank" rel="noopener">Export PDF <span>↗</span></a>
+            <div class="table-export-actions"><a class="button button-soft" href="{{ route('admin.members.export.excel') }}">Excel Export <span>↓</span></a><a class="button button-primary" href="{{ route('admin.members.export.pdf', request()->only('q')) }}" target="_blank" rel="noopener">Export PDF <span>↗</span></a></div>
         </div>
         <div class="table-tools">
             <form class="per-page-form" method="GET" action="{{ route('admin.dashboard') }}"><label
@@ -61,7 +61,7 @@
                             <div class="member-cell">@if($member->photo)<img src="{{ Storage::url($member->photo) }}"
                                     alt="">@else<span
                                     class="table-avatar">{{ strtoupper(substr($member->name,0,1)) }}</span>@endif<div>
-                                    <b>{{ $member->name }}</b><small>{{ $member->email ?: 'No email provided' }}</small>
+                                    <b>{{ $member->name_assamese ?: $member->name }}</b><small>{{ $member->name_assamese ? $member->name : '' }}</small>@if($member->name_assamese)<small>{{ $member->email ?: 'No email provided' }}</small>@else<small>{{ $member->email ?: 'No email provided' }}</small>@endif
                                 </div>
                             </div>
                         </td>

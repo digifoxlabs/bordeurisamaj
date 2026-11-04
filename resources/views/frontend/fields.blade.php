@@ -1,6 +1,9 @@
 @php($member = $member ?? null)
 @php($v = fn($key, $fallback = '') => old($key, $member->$key ?? $fallback))
 <div class="form-grid">
+    @if(request()->routeIs('admin.members.edit'))
+    <label class="field"><span>{{ __('membership.name') }}</span><input name="name_assamese" value="{{ $v('name_assamese') }}" maxlength="160"><small class="error-text">{{ $errors->first('name_assamese') }}</small></label>
+    @endif
     <label class="field"><span>Name <small class="label-as">/ {{ __('membership.name') }}</small> <i>*</i></span><input
             name="name" value="{{ $v('name') }}" placeholder="Your full name" required maxlength="160"><small
             class="error-text">{{ $errors->first('name') }}</small></label>
@@ -24,6 +27,9 @@
                     <small>{{ __("membership.$key") }}</small></span></label>@endforeach</div><small
             class="error-text">{{ $errors->first('role') }}</small>
     </fieldset>
+    @if(request()->routeIs('admin.members.edit'))
+    <label class="field"><span>{{ __('membership.father_name') }}</span><input name="father_name_assamese" value="{{ $v('father_name_assamese') }}" maxlength="160"><small class="error-text">{{ $errors->first('father_name_assamese') }}</small></label>
+    @endif
     <label class="field"><span>Father's name <small class="label-as">/
             {{ __('membership.father_name') }}</small> <i>*</i></span><input name="father_name"
             value="{{ $v('father_name') }}" placeholder="Father's full name" required maxlength="160"><small
