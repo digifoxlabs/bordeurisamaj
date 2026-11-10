@@ -24,7 +24,7 @@
                 <h2>Member records</h2>
                 <p>View, print, edit or remove a member entry.</p>
             </div>
-            <div class="table-export-actions"><a class="button button-soft" href="{{ route('admin.members.export.excel') }}">Excel Export <span>↓</span></a><a class="button button-primary" href="{{ route('admin.members.export.pdf', request()->only('q')) }}" target="_blank" rel="noopener">Export PDF <span>↗</span></a></div>
+            <div class="table-export-actions" aria-label="Member export options"><a class="button button-soft export-button" href="{{ route('admin.members.export.excel') }}"><span class="export-button-label">Excel</span><span class="export-button-detail">Download spreadsheet</span></a><a class="button button-soft export-button" href="{{ route('admin.members.export.pdf', request()->only('q')) }}" target="_blank" rel="noopener"><span class="export-button-label">All members PDF</span><span class="export-button-detail">Export matching records</span></a><form class="selected-export-form" id="selected-members-export" method="GET" action="{{ route('admin.members.export.pdf') }}" target="_blank"><input type="hidden" name="q" value="{{ request('q') }}"><input type="hidden" name="selected" value="1"><button class="button button-primary export-button" id="export-selected-button" type="submit" disabled><span class="export-button-label">Selected PDF <span class="export-count">(<span id="selected-member-count">0</span>)</span></span><span class="export-button-detail">Choose rows below</span></button></form></div>
         </div>
         <div class="table-tools">
             <form class="per-page-form" method="GET" action="{{ route('admin.dashboard') }}"><label
@@ -49,6 +49,7 @@
             <table>
                 <thead>
                     <tr>
+                        <th><input type="checkbox" id="select-visible-members" aria-label="Select all members on this page"></th>
                         <th>MEMBER</th>
                         <th>MOBILE</th>
                         <th>COMMUNITY ROLE</th>
@@ -57,6 +58,7 @@
                     </tr>
                 </thead>
                 <tbody>@forelse($members as $member)<tr>
+                        <td><input type="checkbox" class="member-export-checkbox" name="ids[]" value="{{ $member->id }}" form="selected-members-export" aria-label="Select {{ $member->name }} for PDF export"></td>
                         <td>
                             <div class="member-cell">@if($member->photo)<img src="{{ Storage::url($member->photo) }}"
                                     alt="">@else<span
@@ -73,28 +75,57 @@
                             <form id="delete-member-{{ $member->id }}" method="POST" action="{{ route('admin.members.destroy',$member) }}" hidden>@csrf @method('DELETE')</form>
                         </td>
                     </tr>@empty<tr>
-                        <td colspan="5" class="empty-row">No member records found. @if(request('q'))Try a different
+                        <td colspan="6" class="empty-row">No member records found. @if(request('q'))Try a different
                             search.@endif</td>
                     </tr>@endforelse</tbody>
             </table>
         </div>
-        @if($members->hasPages())<nav class="member-pagination" aria-label="Member records pages"><span
-                class="pagination-summary">Showing {{ $members->firstItem() }}–{{ $members->lastItem() }} of
-                {{ $members->total() }}</span>
-            <div class="pagination-links">@if($members->onFirstPage())<span
-                    class="pagination-disabled">Previous</span>@else<a
-                    href="{{ $members->previousPageUrl() }}">Previous</a>@endif @foreach($members->getUrlRange(1,
-                $members->lastPage()) as $page => $url)@if($page === $members->currentPage())<span
-                    class="pagination-current" aria-current="page">{{ $page }}</span>@else<a
-                    href="{{ $url }}">{{ $page }}</a>@endif @endforeach @if($members->hasMorePages())<a
-                    href="{{ $members->nextPageUrl() }}">Next</a>@else<span
-                    class="pagination-disabled">Next</span>@endif</div>
-        </nav>@endif
+        @if($members->hasPages())
+            @php
+                $lastPage = $members->lastPage();
+                $currentPage = $members->currentPage();
+                $startPage = max(2, $currentPage - 1);
+                $endPage = min($lastPage - 1, $currentPage + 1);
+            @endphp
+            <nav class="member-pagination" aria-label="Member records pages">
+                <span class="pagination-summary">Showing {{ $members->firstItem() }}–{{ $members->lastItem() }} of {{ $members->total() }}</span>
+                <div class="pagination-links">
+                    @if($members->onFirstPage())<span class="pagination-disabled">Previous</span>@else<a href="{{ $members->previousPageUrl() }}">Previous</a>@endif
+                    @if($currentPage === 1)<span class="pagination-current" aria-current="page">1</span>@else<a href="{{ $members->url(1) }}">1</a>@endif
+                    @if($lastPage > 2)
+                        @if($startPage > 2)<span class="pagination-ellipsis" aria-hidden="true">…</span>@endif
+                        @foreach(range($startPage, $endPage) as $page)
+                            @if($page === $currentPage)<span class="pagination-current" aria-current="page">{{ $page }}</span>@else<a href="{{ $members->url($page) }}">{{ $page }}</a>@endif
+                        @endforeach
+                        @if($endPage < $lastPage - 1)<span class="pagination-ellipsis" aria-hidden="true">…</span>@endif
+                        @if($currentPage === $lastPage)<span class="pagination-current" aria-current="page">{{ $lastPage }}</span>@else<a href="{{ $members->url($lastPage) }}">{{ $lastPage }}</a>@endif
+                    @endif
+                    @if($members->hasMorePages())<a href="{{ $members->nextPageUrl() }}">Next</a>@else<span class="pagination-disabled">Next</span>@endif
+                </div>
+            </nav>
+        @endif
     </section>
 </div>
 <dialog class="delete-modal" id="delete-member-modal" aria-labelledby="delete-modal-title"><div class="delete-modal-content"><h2 id="delete-modal-title">Delete member record?</h2><p>This will permanently remove the member and their stored documents.</p><div class="delete-modal-actions"><button type="button" class="button button-soft" data-close-delete>Cancel</button><button type="button" class="button button-danger" id="confirm-delete-member">Delete record</button></div></div></dialog>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    const selectVisible = document.getElementById('select-visible-members');
+    const memberCheckboxes = [...document.querySelectorAll('.member-export-checkbox')];
+    const exportButton = document.getElementById('export-selected-button');
+    const selectedCount = document.getElementById('selected-member-count');
+    const updateSelection = () => {
+        const count = memberCheckboxes.filter(checkbox => checkbox.checked).length;
+        selectedCount.textContent = count;
+        exportButton.disabled = count === 0;
+        selectVisible.checked = memberCheckboxes.length > 0 && count === memberCheckboxes.length;
+        selectVisible.indeterminate = count > 0 && count < memberCheckboxes.length;
+    };
+    selectVisible.addEventListener('change', () => {
+        memberCheckboxes.forEach(checkbox => { checkbox.checked = selectVisible.checked; });
+        updateSelection();
+    });
+    memberCheckboxes.forEach(checkbox => checkbox.addEventListener('change', updateSelection));
+
     const modal = document.getElementById('delete-member-modal');
     let formId = null;
     const menus = [...document.querySelectorAll('.actions-menu')];

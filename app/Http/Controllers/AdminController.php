@@ -47,8 +47,15 @@ class AdminController extends Controller
 
     public function exportMembersPdf(Request $request)
     {
+        $validated = $request->validate([
+            'ids' => [$request->boolean('selected') ? 'required' : 'sometimes', 'array', 'min:1'],
+            'ids.*' => ['required', 'integer', 'distinct', 'exists:members,id'],
+        ]);
+
         $query = Member::query()->latest();
-        if ($search = $request->string('q')->trim()->toString()) {
+        if (! empty($validated['ids'])) {
+            $query->whereIn('id', $validated['ids']);
+        } elseif ($search = $request->string('q')->trim()->toString()) {
             $query->where(fn ($q) => $q->where('name', 'like', "%$search%")->orWhere('mobile', 'like', "%$search%"));
         }
 
