@@ -31,14 +31,16 @@ class AdminController extends Controller
 
     public function dashboard(Request $request)
     {
-        $query = Member::query()->latest();
+        $query = Member::query()->orderBy('id');
         if ($search = $request->string('q')->trim()->toString()) $query->where(fn ($q) => $q->where('name', 'like', "%$search%")->orWhere('mobile', 'like', "%$search%"));
+        if ($role = $request->string('role')->trim()->toString()) $query->where('role', $role);
         $pageSize = $request->query('per_page', '10');
         if (! in_array((string) $pageSize, ['10', '50', '100', 'all'], true)) $pageSize = '10';
         $perPage = $pageSize === 'all' ? max($query->count(), 1) : (int) $pageSize;
 
         return view('admin.dashboard', [
             'members' => $query->paginate($perPage)->withQueryString(),
+            'communityRoles' => Member::query()->whereNotNull('role')->where('role', '<>', '')->distinct()->orderBy('role')->pluck('role'),
             'pageSize' => (string) $pageSize,
             'total' => Member::count(),
             'today' => Member::whereDate('created_at', today())->count(),
@@ -52,12 +54,12 @@ class AdminController extends Controller
             'ids.*' => ['required', 'integer', 'distinct', 'exists:members,id'],
         ]);
 
-        $query = Member::query()->latest();
+        $query = Member::query()->orderBy('id');
         if (! empty($validated['ids'])) {
             $query->whereIn('id', $validated['ids']);
-        } elseif ($search = $request->string('q')->trim()->toString()) {
-            $query->where(fn ($q) => $q->where('name', 'like', "%$search%")->orWhere('mobile', 'like', "%$search%"));
         }
+        if ($search = $request->string('q')->trim()->toString()) $query->where(fn ($q) => $q->where('name', 'like', "%$search%")->orWhere('mobile', 'like', "%$search%"));
+        if ($role = $request->string('role')->trim()->toString()) $query->where('role', $role);
 
         return view('admin.members-export', ['members' => $query->get()]);
     }

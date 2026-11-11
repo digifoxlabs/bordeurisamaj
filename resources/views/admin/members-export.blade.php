@@ -10,14 +10,14 @@
 </head>
 <body>
     <header class="export-heading">
-        <div><h1>Member records</h1><p>Kamakhya Devalaya · {{ $members->count() }} {{ Str::plural('member', $members->count()) }}@if(request('q')) · Search: {{ request('q') }}@endif</p></div>
+        <div><h1>Member records</h1><p>Kamakhya Devalaya · {{ $members->count() }} {{ Str::plural('member', $members->count()) }}@if(request('q')) · Search: {{ request('q') }}@endif @if(request('role')) · Community role: {{ request('role') }}@endif</p></div>
         <button class="no-print" onclick="window.print()">Save as PDF</button>
     </header>
     <table>
-        <thead><tr><th>PHOTO</th><th>MEMBER</th><th>FATHER'S NAME</th><th>MOBILE</th><th>COMMUNITY ROLE</th><th>JOINED</th></tr></thead>
+        <thead><tr><th>SL NO</th><th>PHOTO</th><th>MEMBER</th><th>FATHER'S NAME</th><th>MOBILE</th><th>COMMUNITY ROLE</th></tr></thead>
         <tbody>
             @forelse($members as $member)
-                <tr><td class="photo-cell">@if($member->photo)<img class="member-photo" src="{{ Storage::url($member->photo) }}" alt="">@else<div class="member-photo" aria-label="No photo"></div>@endif</td><td><span class="member-name">{{ $member->name_assamese ?: $member->name }}{{ $member->name_assamese ? ' / '.$member->name : '' }}</span><span class="member-email">{{ $member->email ?: 'No email provided' }}</span></td><td>{{ $member->father_name_assamese ? $member->father_name_assamese.' / ' : '' }}{{ $member->father_name ?: '—' }}</td><td>{{ $member->mobile }}</td><td>{{ $member->role ?: '—' }}</td><td>{{ $member->created_at->format('d M Y') }}</td></tr>
+                <tr><td>{{ $loop->iteration }}</td><td class="photo-cell">@if($member->photo)<img class="member-photo" src="{{ Storage::url($member->photo) }}" alt="">@else<div class="member-photo" aria-label="No photo"></div>@endif</td><td><span class="member-name">{{ $member->name_assamese ?: $member->name }}{{ $member->name_assamese ? ' / '.$member->name : '' }}</span><span class="member-email">{{ $member->email ?: 'No email provided' }}</span></td><td>{{ $member->father_name_assamese ? $member->father_name_assamese.' / ' : '' }}{{ $member->father_name ?: '—' }}</td><td>{{ $member->mobile }}</td><td>{{ $member->role ?: '—' }}</td></tr>
             @empty
                 <tr><td class="empty" colspan="6">No member records found.</td></tr>
             @endforelse

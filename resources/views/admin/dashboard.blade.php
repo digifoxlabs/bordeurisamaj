@@ -24,7 +24,7 @@
                 <h2>Member records</h2>
                 <p>View, print, edit or remove a member entry.</p>
             </div>
-            <div class="table-export-actions" aria-label="Member export options"><a class="button button-soft export-button" href="{{ route('admin.members.export.excel') }}"><span class="export-button-label">Excel</span><span class="export-button-detail">Download spreadsheet</span></a><a class="button button-soft export-button" href="{{ route('admin.members.export.pdf', request()->only('q')) }}" target="_blank" rel="noopener"><span class="export-button-label">All members PDF</span><span class="export-button-detail">Export matching records</span></a><form class="selected-export-form" id="selected-members-export" method="GET" action="{{ route('admin.members.export.pdf') }}" target="_blank"><input type="hidden" name="q" value="{{ request('q') }}"><input type="hidden" name="selected" value="1"><button class="button button-primary export-button" id="export-selected-button" type="submit" disabled><span class="export-button-label">Selected PDF <span class="export-count">(<span id="selected-member-count">0</span>)</span></span><span class="export-button-detail">Choose rows below</span></button></form></div>
+            <div class="table-export-actions" aria-label="Member export options"><a class="button button-soft export-button" href="{{ route('admin.members.export.excel') }}"><span class="export-button-label">Excel</span><span class="export-button-detail">Download spreadsheet</span></a><a class="button button-soft export-button" href="{{ route('admin.members.export.pdf', request()->only('q', 'role')) }}" target="_blank" rel="noopener"><span class="export-button-label">All members PDF</span><span class="export-button-detail">Export matching records</span></a><form class="selected-export-form" id="selected-members-export" method="GET" action="{{ route('admin.members.export.pdf') }}" target="_blank"><input type="hidden" name="q" value="{{ request('q') }}"><input type="hidden" name="role" value="{{ request('role') }}"><input type="hidden" name="selected" value="1"><button class="button button-primary export-button" id="export-selected-button" type="submit" disabled><span class="export-button-label">Selected PDF <span class="export-count">(<span id="selected-member-count">0</span>)</span></span><span class="export-button-detail">Choose rows below</span></button></form></div>
         </div>
         <div class="table-tools">
             <form class="per-page-form" method="GET" action="{{ route('admin.dashboard') }}"><label
@@ -35,13 +35,13 @@
                         <option value="100" @selected($pageSize==='100' )>100</option>
                         <option value="all" @selected($pageSize==='all' )>All</option>
                     </select><span>records</span></label>@if(request('q'))<input type="hidden" name="q"
-                    value="{{ request('q') }}">@endif</form>
+                    value="{{ request('q') }}">@endif @if(request('role'))<input type="hidden" name="role" value="{{ request('role') }}">@endif</form>
             <form class="search-form" method="GET" action="{{ route('admin.dashboard') }}"><input type="hidden"
                     name="per_page" value="{{ $pageSize }}">
                 <div class="search-input-wrap"><input type="search" name="q" value="{{ request('q') }}"
                         placeholder="Search name or mobile" aria-label="Search by name or mobile">@if(request('q'))<a
                         class="clear-search" href="{{ route('admin.dashboard', ['per_page' => $pageSize]) }}"
-                        aria-label="Clear search" title="Clear search">×</a>@endif</div><button
+                    aria-label="Clear search" title="Clear search">×</a>@endif</div><select name="role" aria-label="Filter by community role" onchange="this.form.submit()"><option value="">All community roles</option>@foreach($communityRoles as $communityRole)<option value="{{ $communityRole }}" @selected(request('role') === $communityRole)>{{ $communityRole }}</option>@endforeach</select><button
                     class="button button-soft" type="submit">Search</button>
             </form>
         </div>
@@ -50,15 +50,16 @@
                 <thead>
                     <tr>
                         <th><input type="checkbox" id="select-visible-members" aria-label="Select all members on this page"></th>
+                        <th>SL NO</th>
                         <th>MEMBER</th>
                         <th>MOBILE</th>
                         <th>COMMUNITY ROLE</th>
-                        <th>JOINED</th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>@forelse($members as $member)<tr>
                         <td><input type="checkbox" class="member-export-checkbox" name="ids[]" value="{{ $member->id }}" form="selected-members-export" aria-label="Select {{ $member->name }} for PDF export"></td>
+                        <td>{{ $members->firstItem() + $loop->index }}</td>
                         <td>
                             <div class="member-cell">@if($member->photo)<img src="{{ Storage::url($member->photo) }}"
                                     alt="">@else<span
@@ -69,7 +70,6 @@
                         </td>
                         <td>{{ $member->mobile }}</td>
                         <td><span class="role-pill">{{ $member->role ?: '—' }}</span></td>
-                        <td>{{ $member->created_at->format('d M Y') }}</td>
                         <td>
                             <details class="actions-menu"><summary><span>Actions</span><svg aria-hidden="true" viewBox="0 0 16 16"><path d="m4 6 4 4 4-4"/></svg></summary><div class="actions-menu-panel"><a href="{{ route('admin.members.show',$member) }}"><span class="action-menu-icon">↗</span>View</a><a href="{{ route('admin.members.edit',$member) }}"><span class="action-menu-icon">✎</span>Edit</a><button type="button" class="delete-action" data-delete-form="delete-member-{{ $member->id }}"><span class="action-menu-icon">⌫</span>Delete</button></div></details>
                             <form id="delete-member-{{ $member->id }}" method="POST" action="{{ route('admin.members.destroy',$member) }}" hidden>@csrf @method('DELETE')</form>
