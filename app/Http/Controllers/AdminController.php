@@ -67,7 +67,7 @@ class AdminController extends Controller
     public function exportMembersExcel()
     {
         $columns = [
-            'id', 'name_assamese', 'name', 'mobile', 'whatsapp', 'email', 'role',
+            'sl_no', 'id', 'name_assamese', 'name', 'mobile', 'whatsapp', 'email', 'role',
             'father_name_assamese', 'father_name', 'grandfather_name', 'date_of_birth',
             'address', 'occupation', 'photo', 'created_at', 'updated_at',
         ];

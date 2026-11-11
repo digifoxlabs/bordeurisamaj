@@ -59,7 +59,7 @@
                 </thead>
                 <tbody>@forelse($members as $member)<tr>
                         <td><input type="checkbox" class="member-export-checkbox" name="ids[]" value="{{ $member->id }}" form="selected-members-export" aria-label="Select {{ $member->name }} for PDF export"></td>
-                        <td>{{ $members->firstItem() + $loop->index }}</td>
+                        <td>{{ $member->sl_no }}</td>
                         <td>
                             <div class="member-cell">@if($member->photo)<img src="{{ Storage::url($member->photo) }}"
                                     alt="">@else<span

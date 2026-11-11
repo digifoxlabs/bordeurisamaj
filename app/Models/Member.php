@@ -13,5 +13,14 @@ class Member extends Model
         return ['date_of_birth' => 'date'];
     }
 
+    protected static function booted(): void
+    {
+        static::creating(function (Member $member) {
+            if ($member->sl_no === null) {
+                $member->sl_no = ((int) static::query()->max('sl_no')) + 1;
+            }
+        });
+    }
+
     public function documents() { return $this->hasMany(MemberDocument::class); }
 }
