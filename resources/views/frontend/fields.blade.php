@@ -2,6 +2,7 @@
 @php($v = fn($key, $fallback = '') => old($key, $member->$key ?? $fallback))
 <div class="form-grid">
     @if(request()->routeIs('admin.members.edit'))
+    <label class="field"><span>Serial number</span><input type="number" name="sl_no" value="{{ $v('sl_no') }}" min="1" step="1" required><small class="error-text">{{ $errors->first('sl_no') }}</small></label>
     <label class="field"><span>{{ __('membership.name') }}</span><input name="name_assamese" value="{{ $v('name_assamese') }}" maxlength="160"><small class="error-text">{{ $errors->first('name_assamese') }}</small></label>
     @endif
     <label class="field"><span>Name <small class="label-as">/ {{ __('membership.name') }}</small> <i>*</i></span><input

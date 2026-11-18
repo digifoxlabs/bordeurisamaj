@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Member extends Model
 {
-    protected $fillable = ['name', 'name_assamese', 'mobile', 'whatsapp', 'email', 'role', 'father_name', 'father_name_assamese', 'grandfather_name', 'date_of_birth', 'address', 'occupation', 'photo'];
+    protected $fillable = ['sl_no', 'name', 'name_assamese', 'mobile', 'whatsapp', 'email', 'role', 'father_name', 'father_name_assamese', 'grandfather_name', 'date_of_birth', 'address', 'occupation', 'photo'];
 
     protected function casts(): array
     {

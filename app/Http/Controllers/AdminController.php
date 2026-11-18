@@ -31,7 +31,7 @@ class AdminController extends Controller
 
     public function dashboard(Request $request)
     {
-        $query = Member::query()->orderBy('id');
+        $query = Member::query()->orderBy('sl_no')->orderBy('id');
         if ($search = $request->string('q')->trim()->toString()) $query->where(fn ($q) => $q->where('name', 'like', "%$search%")->orWhere('mobile', 'like', "%$search%"));
         if ($role = $request->string('role')->trim()->toString()) $query->where('role', $role);
         $pageSize = $request->query('per_page', '10');
@@ -54,7 +54,7 @@ class AdminController extends Controller
             'ids.*' => ['required', 'integer', 'distinct', 'exists:members,id'],
         ]);
 
-        $query = Member::query()->orderBy('id');
+        $query = Member::query()->orderBy('sl_no')->orderBy('id');
         if (! empty($validated['ids'])) {
             $query->whereIn('id', $validated['ids']);
         }
@@ -78,7 +78,7 @@ class AdminController extends Controller
             fwrite($output, "\xEF\xBB\xBF");
             fputcsv($output, $columns);
 
-            Member::query()->orderBy('id')->chunk(500, function ($members) use ($output, $columns) {
+            Member::query()->orderBy('sl_no')->orderBy('id')->chunk(500, function ($members) use ($output, $columns) {
                 foreach ($members as $member) {
                     fputcsv($output, array_map(fn ($column) => $member->getAttribute($column), $columns));
                 }
@@ -95,7 +95,9 @@ class AdminController extends Controller
 
     public function update(Request $request, Member $member)
     {
-        $data = $request->validate((new MemberController)->rules($member));
+        $data = $request->validate(array_merge((new MemberController)->rules($member), [
+            'sl_no' => ['required', 'integer', 'min:1'],
+        ]));
         unset($data['documents']);
         if ($request->hasFile('photo')) {
             if ($member->photo) Storage::disk('public')->delete($member->photo);
