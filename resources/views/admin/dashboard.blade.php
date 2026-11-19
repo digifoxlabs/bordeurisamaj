@@ -54,6 +54,7 @@
                         <th>MEMBER</th>
                         <th>MOBILE</th>
                         <th>COMMUNITY ROLE</th>
+                        <th>বয়স/Age</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -70,12 +71,13 @@
                         </td>
                         <td>{{ $member->mobile }}</td>
                         <td><span class="role-pill">{{ $member->role ?: '—' }}</span></td>
+                        <td>{{ $member->age ?? '—' }}</td>
                         <td>
                             <details class="actions-menu"><summary><span>Actions</span><svg aria-hidden="true" viewBox="0 0 16 16"><path d="m4 6 4 4 4-4"/></svg></summary><div class="actions-menu-panel"><a href="{{ route('admin.members.show',$member) }}"><span class="action-menu-icon">↗</span>View</a><a href="{{ route('admin.members.edit',$member) }}"><span class="action-menu-icon">✎</span>Edit</a><button type="button" class="delete-action" data-delete-form="delete-member-{{ $member->id }}"><span class="action-menu-icon">⌫</span>Delete</button></div></details>
                             <form id="delete-member-{{ $member->id }}" method="POST" action="{{ route('admin.members.destroy',$member) }}" hidden>@csrf @method('DELETE')</form>
                         </td>
                     </tr>@empty<tr>
-                        <td colspan="6" class="empty-row">No member records found. @if(request('q'))Try a different
+                        <td colspan="7" class="empty-row">No member records found. @if(request('q'))Try a different
                             search.@endif</td>
                     </tr>@endforelse</tbody>
             </table>

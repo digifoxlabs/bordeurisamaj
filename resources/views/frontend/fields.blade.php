@@ -41,8 +41,11 @@
             class="error-text">{{ $errors->first('grandfather_name') }}</small></label>
     <label class="field"><span>Date of birth <small class="label-as">/
                 {{ __('membership.date_of_birth') }}</small></span><input type="date" name="date_of_birth"
-            value="{{ $v('date_of_birth') }}" max="{{ now()->toDateString() }}"><small
+            value="{{ old('date_of_birth', $member?->date_of_birth?->format('Y-m-d') ?? '') }}" max="{{ now()->toDateString() }}"><small
             class="error-text">{{ $errors->first('date_of_birth') }}</small></label>
+    @if(request()->routeIs('admin.members.edit'))
+    <label class="field"><span>বয়স/Age</span><input type="number" name="age" value="{{ $v('age') }}" min="0" max="150" step="1"><small class="error-text">{{ $errors->first('age') }}</small></label>
+    @endif
     <label class="field"><span>Occupation / designation <small class="label-as">/
                 {{ __('membership.occupation') }}</small></span><input name="occupation" value="{{ $v('occupation') }}"
             placeholder="Your occupation or designation"><small

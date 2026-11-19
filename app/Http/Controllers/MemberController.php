@@ -22,6 +22,7 @@ class MemberController extends Controller
             'father_name_assamese' => ['nullable', 'string', 'max:160'],
             'grandfather_name' => ['required', 'string', 'max:160'],
             'date_of_birth' => ['nullable', 'date', 'before_or_equal:today'],
+            'age' => ['nullable', 'integer', 'min:0', 'max:150'],
             'address' => ['nullable', 'string', 'max:2000'],
             'occupation' => ['nullable', 'string', 'max:190'],
             'photo' => ['nullable', 'image', 'max:5120'],

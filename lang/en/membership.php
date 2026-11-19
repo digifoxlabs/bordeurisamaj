@@ -16,4 +16,5 @@ return [
     'address' => 'ঠিকনা',
     'occupation' => 'বৃত্তি / পদবী',
     'photo' => 'ফটো',
+    'age' => 'বয়স',
 ];

@@ -68,7 +68,7 @@ class AdminController extends Controller
     {
         $columns = [
             'sl_no', 'id', 'name_assamese', 'name', 'mobile', 'whatsapp', 'email', 'role',
-            'father_name_assamese', 'father_name', 'grandfather_name', 'date_of_birth',
+            'father_name_assamese', 'father_name', 'grandfather_name', 'date_of_birth', 'age',
             'address', 'occupation', 'photo', 'created_at', 'updated_at',
         ];
 
